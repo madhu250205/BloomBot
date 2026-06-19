@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantCare - Plant Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #388E3C;
+            --accent-color: #8BC34A;
+            --dark-color: #2E7D32;
+            --light-color: #C8E6C9;
+            --text-color: #333;
+            --text-light: #777;
+            --white: #ffffff;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f5f5; color: var(--text-color); }
+
+        /* Main Content Styles */
+        .content { padding: 20px; background-color: #f9f9f9; max-width: 1200px; margin: 0 auto; min-height: 100vh; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header h1 { color: var(--primary-color); }
+
+        .user-actions { display: flex; align-items: center; gap: 15px; }
+
+        .search-box { position: relative; display: flex; align-items: center; }
+        .search-box input { padding: 8px 15px 8px 35px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; width: 250px; }
+        .search-box i { position: absolute; left: 10px; color: var(--text-light); }
+
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; transition: all 0.3s; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--secondary-color); }
+        .btn-secondary { background-color: #e0e0e0; color: var(--text-color); }
+        .btn-secondary:hover { background-color: #d0d0d0; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: #c82333; }
+
+        /* Card Styles */
+        .card { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 20px; overflow-x: auto; }
+
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; min-width: 800px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; font-weight: 600; color: var(--text-color); }
+        tr:hover { background-color: #f5f5f5; }
+
+        .status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-active { background-color: #d4edda; color: #155724; }
+        .status-inactive { background-color: #fff3cd; color: #856404; }
+        .status-suspended { background-color: #f8d7da; color: #721c24; }
+
+        .action-btn { background: none; border: none; cursor: pointer; color: var(--text-light); margin: 0 5px; font-size: 1rem; transition: all 0.2s; }
+        .action-btn:hover { color: var(--primary-color); }
+        .action-btn.delete:hover { color: var(--danger); }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
+        .pagination button { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 5px 10px; cursor: pointer; transition: all 0.3s; }
+        .pagination button:hover { background-color: #f0f0f0; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); overflow: auto; }
+        .modal-content { background-color: var(--white); margin: 5% auto; border-radius: 8px; width: 50%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); animation: modalopen 0.3s; }
+        .modal-content.small { width: 40%; }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 1.3rem; color: var(--primary-color); }
+        .close { color: var(--text-light); font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .close:hover { color: var(--text-color); }
+        .modal-body { padding: 20px; }
+
+        /* Form Styles */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;}
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+        /* Plant-specific styles */
+        .plant-image-thumb { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; }
+        .health-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; }
+        .health-excellent { background-color: #28a745; }
+        .health-good { background-color: #8bc34a; }
+        .health-fair { background-color: #ffc107; }
+        .health-poor { background-color: #fd7e14; }
+        .health-critical { background-color: #dc3545; }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) { .modal-content { width: 70%; } .modal-content.small { width: 50%; } }
+        @media (max-width: 768px) {
+            .modal-content { width: 90%; margin: 10% auto; }
+            .modal-content.small { width: 80%; }
+            .header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .user-actions { width: 100%; justify-content: space-between; }
+            .search-box input { width: 180px; }
+        }
+        @media (max-width: 576px) { .search-box input { width: 150px; } }
+        @keyframes modalopen { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <main class="content">
+        <header class="header">
+            <h1>Plant Management</h1>
+            <div class="user-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search plants...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <button id="addPlantBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Plant
+                </button>
+            </div>
+        </header>
+
+        <div class="card">
+            <table id="plantsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Health</th>
+                        <th>Last Watered</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PL001</td>
+                        <td><img src="https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb" alt="Monstera" class="plant-image-thumb"></td>
+                        <td>Monstera Deliciosa</td>
+                        <td>Tropical</td>
+                        <td>Living Room</td>
+                        <td><span class="health-indicator health-excellent"></span> Excellent</td>
+                        <td>2 days ago</td>
+                        <td><span class="status status-active">Active</span></td>
+                        <td>
+                            <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PL002</td>
+                        <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlJSHy0R6T2sqDZBhAFEMGVUu9UtDDj1E9GBlXWtZd-g&s=10" alt="Snake Plant" class="plant-image-thumb"></td>
+                        <td>Snake Plant</td>
+                        <td>Succulent</td>
+                        <td>Bedroom</td>
+                        <td><span class="health-indicator health-good"></span> Good</td>
+                        <td>5 days ago</td>
+                        <td><span class="status status-active">Active</span></td>
+                        <td>
+                            <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PL003</td>
+                        <td><img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411" alt="Fiddle Leaf Fig" class="plant-image-thumb"></td>
+                        <td>Fiddle Leaf Fig</td>
+                        <td>Tree</td>
+                        <td>Office</td>
+                        <td><span class="health-indicator health-fair"></span> Fair</td>
+                        <td>1 week ago</td>
+                        <td><span class="status status-active">Active</span></td>
+                        <td>
+                            <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PL004</td>
+                        <td><img src="https://images.unsplash.com/photo-1512428813834-c702c7702b78" alt="Pothos" class="plant-image-thumb"></td>
+                        <td>Golden Pothos</td>
+                        <td>Vine</td>
+                        <td>Kitchen</td>
+                        <td><span class="health-indicator health-poor"></span> Poor</td>
+                        <td>3 days ago</td>
+                        <td><span class="status status-inactive">Inactive</span></td>
+                        <td>
+                            <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PL005</td>
+                        <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhyMj3vXlZ4WOPcCPAXBdsurA9x5qIj7tIN70aQKUn3w&s=10" alt="Cactus" class="plant-image-thumb"></td>
+                        <td>Barrel Cactus</td>
+                        <td>Cactus</td>
+                        <td>Patio</td>
+                        <td><span class="health-indicator health-critical"></span> Critical</td>
+                        <td>2 weeks ago</td>
+                        <td><span class="status status-suspended">Suspended</span></td>
+                        <td>
+                            <button class="action-btn edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button id="prevPage" disabled><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <div id="plantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Plant</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="plantForm">
+                    <input type="hidden" id="plantId">
+                    <div class="form-group">
+                        <label for="plantName">Plant Name</label>
+                        <input type="text" id="plantName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantType">Plant Type</label>
+                        <select id="plantType" required>
+                            <option value="">Select Type</option>
+                            <option value="tropical">Tropical</option>
+                            <option value="succulent">Succulent</option>
+                            <option value="cactus">Cactus</option>
+                            <option value="tree">Tree</option>
+                            <option value="vine">Vine</option>
+                            <option value="herb">Herb</option>
+                            <option value="flower">Flowering Plant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantLocation">Location</label>
+                        <input type="text" id="plantLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantHealth">Health Status</label>
+                        <select id="plantHealth" required>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="poor">Poor</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantStatus">Status</label>
+                        <select id="plantStatus" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastWatered">Last Watered</label>
+                        <input type="date" id="lastWatered" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="wateringFrequency">Watering Frequency (days)</label>
+                        <input type="number" id="wateringFrequency" min="1" value="7" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantImage">Plant Image URL</label>
+                        <input type="url" id="plantImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="plantNotes">Notes</label>
+                        <textarea id="plantNotes" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelPlantBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Plant</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h2>Confirm Action</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to delete this plant?</p>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="confirmCancel">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmAction">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Modal functionality & Variables
+            const plantModal = document.getElementById("plantModal");
+            const confirmModal = document.getElementById("confirmModal");
+            const addPlantBtn = document.getElementById("addPlantBtn");
+            const cancelPlantBtn = document.getElementById("cancelPlantBtn");
+            const closeButtons = document.querySelectorAll(".close");
+            const confirmCancel = document.getElementById("confirmCancel");
+            
+            // 2. Open Add Plant Modal
+            addPlantBtn.addEventListener("click", function() {
+                document.getElementById("modalTitle").textContent = "Add New Plant";
+                document.getElementById("plantForm").reset();
+                plantModal.style.display = "block";
+            });
+            
+            // 3. Close Modals Safely
+            closeButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    this.closest(".modal").style.display = "none";
+                });
+            });
+            
+            cancelPlantBtn.addEventListener("click", function() {
+                plantModal.style.display = "none";
+            });
+            
+            confirmCancel.addEventListener("click", function() {
+                confirmModal.style.display = "none";
+            });
+            
+            window.addEventListener("click", function(event) {
+                if (event.target.classList.contains("modal")) {
+                    event.target.style.display = "none";
+                }
+            });
+            
+            // 4. Edit and Delete buttons functionality
+            const editButtons = document.querySelectorAll(".action-btn.edit");
+            const deleteButtons = document.querySelectorAll(".action-btn.delete");
+            const confirmAction = document.getElementById("confirmAction");
+            
+            editButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const row = this.closest("tr");
+                    document.getElementById("modalTitle").textContent = "Edit Plant";
+                    
+                    document.getElementById("plantId").value = row.cells[0].textContent;
+                    document.getElementById("plantName").value = row.cells[2].textContent;
+                    document.getElementById("plantType").value = row.cells[3].textContent.toLowerCase();
+                    document.getElementById("plantLocation").value = row.cells[4].textContent;
+                    
+                    const healthText = row.cells[5].textContent.trim();
+                    let healthValue = "good";
+                    if (healthText.includes("Excellent")) healthValue = "excellent";
+                    else if (healthText.includes("Fair")) healthValue = "fair";
+                    else if (healthText.includes("Poor")) healthValue = "poor";
+                    else if (healthText.includes("Critical")) healthValue = "critical";
+                    document.getElementById("plantHealth").value = healthValue;
+                    
+                    document.getElementById("plantStatus").value = row.querySelector(".status").textContent.toLowerCase();
+                    
+                    plantModal.style.display = "block";
+                });
+            });
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const plantName = this.closest("tr").cells[2].textContent;
+                    document.getElementById("confirmMessage").textContent = 
+                        `Are you sure you want to delete the plant "${plantName}"?`;
+                    confirmModal.style.display = "block";
+                });
+            });
+            
+            confirmAction.addEventListener("click", function() {
+                alert("Plant deleted successfully!");
+                confirmModal.style.display = "none";
+            });
+            
+            // 5. Form submission
+            document.getElementById("plantForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const isNew = document.getElementById("plantId").value === "";
+                alert(`Plant ${isNew ? 'added' : 'updated'} successfully!`);
+                plantModal.style.display = "none";
+            });
+            
+            // 6. Pagination
+            const prevPageBtn = document.getElementById("prevPage");
+            const nextPageBtn = document.getElementById("nextPage");
+            const pageInfo = document.getElementById("pageInfo");
+            
+            let currentPage = 1;
+            const totalPages = 3;
+            
+            function updatePagination() {
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages;
+            }
+            
+            prevPageBtn.addEventListener("click", function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePagination();
+                }
+            });
+            
+            nextPageBtn.addEventListener("click", function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePagination();
+                }
+            });
+            
+        // THIS IS THE FINAL CLOSING BRACKET FOR THE DOMCONTENTLOADED WRAPPER
+        });
+    </script>

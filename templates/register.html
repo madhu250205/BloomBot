@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - BloomBot</title>
+    <style>
+        body { margin: 0; padding: 0; background-image: url('{{ url_for("static", filename="images/plant-bg.png") }}'); background-size: cover; background-position: center; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .register-container { background-color: rgb(193, 244, 201); padding: 30px; width: 380px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); text-align: center; }
+        .register-container h2 { margin-bottom: 20px; color: #188003; }
+        .tab-switch { display: flex; justify-content: center; margin-bottom: 20px; }
+        .tab-switch a { padding: 10px 25px; text-decoration: none; font-weight: bold; border: 1px solid #ccc; color: #016c01c9; }
+        .tab-switch a.active { background: linear-gradient(to right, #7aefd2, #5ee157); color: rgb(20, 72, 4); border: none; }
+        input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        .register-btn { border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; background-color: #188003; color: white; cursor: pointer; }
+        .register-btn:hover { opacity: 0.9; }
+        .login-link { margin-top: 15px; font-size: 14px; }
+        .login-link a { color: #2bc22b; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Register your account</h2>
+        <div class="tab-switch">
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" class="active">Signup</a>
+        </div>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul style="color: red; text-align: left; font-size: 14px;">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="name" placeholder="Enter your first name..." required>
+            <input type="text" name="username" placeholder="Enter the username..." required>
+            <input type="email" name="email" placeholder="Enter your email address..." required>
+            <input type="password" name="password" placeholder="Enter your password..." required>
+            <input type="password" name="confirm_password" placeholder="Enter your password again..." required>
+            <button class="register-btn" type="submit">Sign up</button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Sign in</a>.
+        </div>
+    </div>
+</body>
+</html>

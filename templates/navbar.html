@@ -1,0 +1,40 @@
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="{{ url_for('static', filename='images/bloombot.jpeg') }}" alt="BloomBot Logo" style="width: 50px; height: 50px; margin-right: 12px; border-radius: 8px; object-fit: contain;">
+    <span class="brand-name">BLOOMBOT<br>Grow, Water, Thrive<br></span>
+  </div>
+  <div class="nav-center">
+    <a href="{{ url_for('home') }}" class="{% if request.path == '/home' %}active{% endif %}">Home</a>
+    <a href="{{ url_for('dashboard') }}" class="{% if request.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="{{ url_for('plant_health') }}" class="{% if request.path == '/plant_health' %}active{% endif %}">Plant Health Tips</a>
+    <a href="{{ url_for('plant_management') }}" class="{% if request.path == '/plant_management' %}active{% endif %}">Plant Management</a>
+    <a href="{{ url_for('health_tracker') }}" class="{% if request.path == '/health_tracker' %}active{% endif %}">Health Tracker</a>
+    
+  <div class="nav-right">
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</nav>
+
+<style>
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background-color: #2f4f4f;
+  padding: 10px 30px;
+  color: rgb(131, 234, 124);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  font-family: 'Segoe UI', sans-serif;
+}
+.nav-left { display: flex; align-items: center; }
+.nav-center { display: flex; flex-wrap: wrap; justify-content: center; flex: 1 1 auto; }
+.nav-right { display: flex; align-items: center; white-space: nowrap; }
+.nav-left img { width: 50px; height: 50px; margin-right: 12px; object-fit: contain; }
+.brand-name { font-weight: bold; font-size: 22px; color: rgb(160, 247, 173); }
+.nav-center a, .nav-right a { color: white; text-decoration: none; margin-left: 15px; padding: 10px 14px; border-radius: 8px; transition: background-color 0.3s ease; font-weight: bold; }
+.nav-center a:hover, .nav-right a:hover { background-color: #4c8c8c; }
+.nav-center a.active { background-color: #66b2b2; color: white; }
+</style>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Health Tips - BloomBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+    .video-section {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .video-wrapper iframe, .video-wrapper video {
+            position: absolute;
+            top: -60px; /* Pulls the video UP to hide the title */
+            left: 0;
+            width: 100%;
+            height: calc(100% + 120px); /* Stretches it to cover the gap */
+            border: none;
+            pointer-events: none; /* Optional: Stops users from clicking the video to pause it, keeping it purely as background */
+        }
+        .video-title {
+            color: var(--dark-color);
+            margin-top: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        :root {
+            --primary-color: #4CAF50; --dark-color: #2E7D32; --light-bg: #f0fdf4;
+            --white: #ffffff; --text-main: #333; --text-muted: #666;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--text-main); }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .header-section { text-align: center; margin-bottom: 50px; }
+        .header-section h1 { color: var(--dark-color); font-size: 2.8rem; margin-bottom: 10px; }
+        .header-section p { color: var(--text-muted); font-size: 1.2rem; }
+
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .tip-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .tip-card:hover { transform: translateY(-8px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+
+        .tip-image-placeholder { height: 180px; background: linear-gradient(135deg, #a8e063, #56ab2f); display: flex; align-items: center; justify-content: center; font-size: 4rem; color: var(--white); }
+        .bg-water { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+        .bg-sun { background: linear-gradient(135deg, #f6d365, #fda085); }
+        .bg-soil { background: linear-gradient(135deg, #e6d0ce, #b9935a); }
+
+        .tip-content { padding: 25px; }
+        .tip-content h3 { color: var(--dark-color); margin-top: 0; margin-bottom: 15px; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+        .tip-content p { color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+        
+        .read-more-btn { display: inline-block; padding: 8px 20px; background-color: var(--primary-color); color: var(--white); text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.9rem; transition: background-color 0.3s ease; }
+        .read-more-btn:hover { background-color: var(--dark-color); }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <div class="main-content">
+        <div class="header-section">
+            <h1>🌿 Plant Health Tips</h1>
+            <p>Hello, {{ username }}! Here is your ultimate guide to keeping your plants healthy and happy.</p>
+        </div>
+     <div class="video-section">
+            <div class="video-wrapper">
+                
+                <iframe src="https://www.youtube.com/embed/u46A0WKp2nk?start=171&end=185&autoplay=1&mute=1" 
+                        title="Plant Care Guide" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+
+            </div>
+            <div class="video-title">Featured Guide: Houseplant Basics for Beginners</div>
+        </div>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-image-placeholder bg-water"><i class="fas fa-hand-holding-water"></i></div>
+                <div class="tip-content">
+                    <h3>Watering Matters</h3>
+                    <p>Overwatering is the #1 killer of houseplants. Always check the top 2 inches of soil before adding water. If it feels dry to the touch, it is time to water.</p>
+                    
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-image-placeholder bg-sun"><i class="fas fa-sun"></i></div>
+                <div class="tip-content">
+                    <h3>Mastering Light</h3>
+                    <p>Not all bright light is equal. Learn the difference between direct, bright indirect, and low light to ensure your tropicals and succulents thrive.</p>
+
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-image-placeholder"><i class="fas fa-leaf"></i></div>
+                <div class="tip-content">
+                    <h3>Natural Fertilizer Guide</h3>
+                    <p>Boost your plant's growth naturally! Learn how to safely apply worm castings, compost tea, and organic slow-release fertilizers during the growing season.</p>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

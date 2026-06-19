@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - BloomBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body { 
+            background-color: #f0fdf4; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        .content-area { 
+            padding: 40px; 
+            text-align: left; /* Left aligns the top text */
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        
+        .user-greeting { 
+            color: #15803d; 
+            font-size: 1.5em; 
+            margin-bottom: 20px; 
+            font-weight: bold;
+        }
+        
+        .dot-icon {
+            color: #f97316;
+            margin-right: 8px;
+            font-size: 0.8em;
+        }
+        
+        /* Carousel Container */
+        .carousel-container {
+            max-width: 1000px;
+            margin: 0 0 30px 0;
+            position: relative;
+        }
+
+        /* 2-Image Carousel Magic */
+        .simple-gallery {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 20px;
+            scrollbar-width: none; 
+            padding-bottom: 10px;
+        }
+        .simple-gallery::-webkit-scrollbar { display: none; }
+        
+        .gallery-slide {
+            min-width: calc(50% - 10px); 
+            scroll-snap-align: start;
+        }
+        .gallery-slide img {
+            width: 100%;
+            height: 350px; 
+            object-fit: cover; 
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: block;
+        }
+
+        /* Dots Styling */
+        .carousel-dots {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dot.active {
+            background-color: #166534;
+            transform: scale(1.3);
+        }
+
+        /* Bottom Welcome Text */
+        .welcome-header { 
+            color: #1f2937; 
+            font-size: 1.5em; 
+            margin-top: 10px;
+            margin-bottom: 5px; 
+        }
+        .welcome-subtext {
+            color: #64748b;
+            font-size: 1em;
+            margin-top: 0;
+            margin-bottom: 40px;
+        }
+
+        /* RESTORED: Feature Cards Styling */
+        .feature-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin: 0 auto; 
+        }
+        .feature-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            border-top: 4px solid #22c55e; 
+            transition: transform 0.2s; 
+            text-align: center; /* Keeps your text perfectly centered! */
+        }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-card h3 { color: #166534; margin-top: 0; }
+        .feature-card p { color: #4b5563; }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="content-area">
+        
+        <div class="user-greeting">
+            <span class="dot-icon">●</span> Good Day, {{ name }}!
+        </div>
+        
+        <div class="carousel-container">
+            <div class="simple-gallery" id="imageGallery">
+                <div class="gallery-slide"><img src="{{ url_for('static', filename='images/plant1.jpeg') }}" alt="Plant 1"></div>
+                <div class="gallery-slide"><img src="{{ url_for('static', filename='images/plant2.jpeg') }}" alt="Plant 2"></div>
+                <div class="gallery-slide"><img src="{{ url_for('static', filename='images/plant3.jpeg') }}" alt="Plant 3"></div>
+                <div class="gallery-slide"><img src="{{ url_for('static', filename='images/plant4.jpeg') }}" alt="Plant 4"></div>
+                <div class="gallery-slide"><img src="{{ url_for('static', filename='images/plant5.jpeg') }}" alt="Plant 5"></div>
+            </div>
+            
+            <div class="carousel-dots" id="dotContainer">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+                <div class="dot" onclick="goToSlide(3)"></div>
+                <div class="dot" onclick="goToSlide(4)"></div>
+            </div>
+        </div>
+
+        <h2 class="welcome-header">Welcome to BloomBot!</h2>
+        <p class="welcome-subtext">Hello {{ name }} ({{ email }})</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Track Health</h3>
+                <p>Monitor your plants with real-time updates and weekly health graphs.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Smart Suggestions</h3>
+                <p>Get tailored advice for optimal plant growth based on specific species.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Stay Organized</h3>
+                <p>Keep gardening simple and track watering schedules effortlessly.</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="margin-top: 50px; background: #dcfce7; padding: 20px; border-radius: 8px; display: inline-block; text-align: left;">
+                <strong style="color: #166534;"><i class="fas fa-lightbulb"></i> Tip of the Day:</strong><br>
+                <span style="color: #15803d;">Avoid placing your plants near air vents or heaters. Sudden temperature changes stress them.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const gallery = document.getElementById('imageGallery');
+        const dots = document.querySelectorAll('.dot');
+        const maxIndex = dots.length - 1; 
+        let currentIndex = 0;
+        let autoPlayInterval;
+
+        function updateDots(index) {
+            dots.forEach(dot => dot.classList.remove('active'));
+            if(dots[index]) {
+                dots[index].classList.add('active');
+            }
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            const slideWidth = gallery.clientWidth / 2 + 10; 
+            gallery.scrollTo({ left: slideWidth * index, behavior: 'smooth' });
+            updateDots(currentIndex);
+            resetAutoPlay(); 
+        }
+
+        function nextSlide() {
+            currentIndex++;
+            if (currentIndex > maxIndex - 1) { 
+                currentIndex = 0;
+            }
+            goToSlide(currentIndex);
+        }
+
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(nextSlide, 3500); 
+        }
+
+        function resetAutoPlay() {
+            clearInterval(autoPlayInterval);
+            startAutoPlay();
+        }
+
+        gallery.addEventListener('scroll', () => {
+            const scrollPosition = gallery.scrollLeft;
+            const slideWidth = gallery.clientWidth / 2 + 10;
+            const newIndex = Math.round(scrollPosition / slideWidth);
+            
+            if (newIndex !== currentIndex && newIndex <= maxIndex) {
+                currentIndex = newIndex;
+                updateDots(currentIndex);
+                resetAutoPlay();
+            }
+        });
+
+        startAutoPlay();
+    </script>
+</body> 
+</html>

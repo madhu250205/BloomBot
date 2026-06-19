@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Health Tracker - BloomBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50; --secondary: #81C784; --tertiary: #A5D6A7;
+            --accent: #FFC107; --water: #2196F3; --danger: #F44336;
+            --light: #F1F8E9; --dark: #2E7D32; --gray: #757575;
+        }
+
+        body { background-color: var(--light); color: #333; line-height: 1.6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+
+        .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header { background: linear-gradient(135deg, var(--primary), var(--dark)); color: white; padding: 30px 0; text-align: center; border-radius: 0 0 20px 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { font-size: 1.1rem; opacity: 0.9; }
+
+        .plant-grid, .health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        
+        .plant-card { background-color: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); overflow: hidden; transition: transform 0.3s ease; }
+        .plant-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .card-header { background-color: var(--primary); color: white; padding: 15px 20px; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
+        .card-body { padding: 20px; }
+        .plant-image { height: 180px; background-color: var(--tertiary); display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 15px; border-radius: 10px; }
+        .plant-name { font-size: 1.5rem; color: var(--dark); margin-bottom: 5px; }
+        .plant-species { color: var(--gray); font-style: italic; margin-bottom: 15px; }
+
+        .metric { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .metric:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .metric-info { flex: 1; }
+        .metric-label { font-weight: 500; color: var(--gray); margin-bottom: 5px; display: flex; align-items: center; }
+        .metric-label i { margin-right: 8px; width: 20px; text-align: center; }
+        .metric-value { font-size: 1.2rem; font-weight: bold; }
+        .metric-unit { font-size: 0.9rem; color: var(--gray); margin-left: 3px; }
+
+        .progress-container { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .progress-water { background-color: var(--water); }
+        .progress-humidity { background-color: var(--secondary); }
+
+        .btn { padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; }
+        .btn i { margin-right: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-water { background-color: var(--water); color: white; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
+
+        .reminders-list { list-style: none; margin-top: 15px; padding:0; }
+        .reminder-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .reminder-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; color: white; }
+        .reminder-water { background-color: var(--water); }
+        .reminder-fertilize { background-color: var(--accent); }
+        .reminder-prune { background-color: var(--danger); }
+        .reminder-info { flex: 1; }
+        .reminder-title { font-weight: 500; }
+        .reminder-due { font-size: 0.9rem; color: var(--gray); }
+        .urgent { color: var(--danger); font-weight: bold; }
+
+        .add-plant-section { background-color: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
+        .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .form-group { flex: 1; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;}
+        
+        .tip-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .tip-title { font-weight: 500; color: var(--dark); margin-bottom: 5px; display: flex; align-items: center; }
+        .tip-title i { margin-right: 10px; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <div class="main-content">
+        <header>
+            <h1><i class="fas fa-leaf"></i> Plant Health Tracker</h1>
+            <p class="subtitle">Keep your green friends happy and thriving, {{ username }}</p>
+        </header>
+
+        <section class="add-plant-section">
+            <h2>Add New Plant</h2>
+            <form id="plant-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="plant-name" class="form-label">Plant Name</label>
+                        <input type="text" id="plant-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plant-species" class="form-label">Species</label>
+                        <input type="text" id="plant-species" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="water-freq" class="form-label">Watering Frequency (days)</label>
+                        <input type="number" id="water-freq" class="form-control" min="1" value="7" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="light-req" class="form-label">Light Requirement</label>
+                        <select id="light-req" class="form-control" required>
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="plant-notes" class="form-label">Special Care Notes</label>
+                    <textarea id="plant-notes" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="padding: 12px 24px; font-size: 1.1rem;">
+                    <i class="fas fa-plus"></i> Add Plant
+                </button>
+            </form>
+        </section>
+
+        <div class="plant-grid" id="plant-container">
+            </div>
+
+        <div class="health-grid">
+            <div class="plant-card">
+                <div class="card-header">
+                    <span><i class="fas fa-bell"></i> Upcoming Reminders</span>
+                </div>
+                <div class="card-body">
+                    <ul class="reminders-list" id="reminders-list">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="plant-card">
+                <div class="card-header">
+                    <span><i class="fas fa-lightbulb"></i> Plant Care Tips</span>
+                </div>
+                <div class="card-body">
+                    <div class="tip-item">
+                        <div class="tip-title"><i class="fas fa-tint"></i> Watering Tip</div>
+                        <p>Check soil moisture by sticking your finger 1-2 inches into the soil.</p>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-title"><i class="fas fa-sun"></i> Light Tip</div>
+                        <p>Rotate your plants weekly to ensure even growth on all sides.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const plants = [
+                { id: 1, name: "Mona", species: "Monstera Deliciosa", waterFrequency: 7, lastWatered: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), lightRequirement: "medium", humidity: 60, emoji: "🌿", notes: "Wipe leaves monthly" },
+                { id: 2, name: "Slither", species: "Sansevieria Trifasciata", waterFrequency: 14, lastWatered: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), lightRequirement: "low", humidity: 40, emoji: "🌱", notes: "Don't overwater" }
+            ];
+
+            const reminders = [];
+            const plantForm = document.getElementById('plant-form');
+            const plantContainer = document.getElementById('plant-container');
+            const remindersList = document.getElementById('reminders-list');
+
+            function init() {
+                generateReminders();
+                renderPlants();
+            }
+
+            function renderPlants() {
+                plantContainer.innerHTML = '';
+                plants.forEach(plant => {
+                    const daysSinceWatered = Math.floor((new Date() - plant.lastWatered) / (1000 * 60 * 60 * 24));
+                    const waterPercentage = (daysSinceWatered / plant.waterFrequency) * 100;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'plant-card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span><i class="fas fa-seedling"></i> ${plant.species.split(' ')[0]}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="plant-image">${plant.emoji || '🌱'}</div>
+                            <h3 class="plant-name">${plant.name}</h3>
+                            <p class="plant-species">${plant.species}</p>
+                            
+                            <div class="metric">
+                                <div class="metric-info">
+                                    <div class="metric-label"><i class="fas fa-tint"></i> Water</div>
+                                    <div class="metric-value">${daysSinceWatered}<span class="metric-unit">/${plant.waterFrequency} days</span></div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar progress-water" style="width: ${Math.min(waterPercentage, 100)}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-info">
+                                    <div class="metric-label"><i class="fas fa-sun"></i> Light</div>
+                                    <div class="metric-value">${plant.lightRequirement.charAt(0).toUpperCase() + plant.lightRequirement.slice(1)}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-water" data-id="${plant.id}"><i class="fas fa-tint"></i> Water Now</button>
+                            </div>
+                        </div>
+                    `;
+                    plantContainer.appendChild(card);
+                });
+            }
+
+            function generateReminders() {
+                reminders.length = 0; 
+                plants.forEach(plant => {
+                    const nextWatering = new Date(plant.lastWatered);
+                    nextWatering.setDate(nextWatering.getDate() + plant.waterFrequency);
+                    reminders.push({ plantId: plant.id, type: "water", dueDate: nextWatering, title: `Water ${plant.name}` });
+                });
+                renderReminders();
+            }
+
+            function renderReminders() {
+                remindersList.innerHTML = '';
+                const sortedReminders = [...reminders].sort((a, b) => a.dueDate - b.dueDate);
+                
+                sortedReminders.forEach(reminder => {
+                    const timeDiff = reminder.dueDate - new Date();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    let dueText = daysDiff <= 0 ? 'Due today!' : (daysDiff === 1 ? 'Due tomorrow' : `Due in ${daysDiff} days`);
+                    let isUrgent = daysDiff <= 1;
+
+                    const item = document.createElement('li');
+                    item.className = 'reminder-item';
+                    item.innerHTML = `
+                        <div class="reminder-icon reminder-water"><i class="fas fa-tint"></i></div>
+                        <div class="reminder-info">
+                            <div class="reminder-title">${reminder.title}</div>
+                            <div class="reminder-due">${isUrgent ? `<span class="urgent">${dueText}</span>` : dueText}</div>
+                        </div>
+                    `;
+                    remindersList.appendChild(item);
+                });
+            }
+
+            plantForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newPlant = {
+                    id: plants.length + 1,
+                    name: document.getElementById('plant-name').value,
+                    species: document.getElementById('plant-species').value,
+                    waterFrequency: parseInt(document.getElementById('water-freq').value),
+                    lastWatered: new Date(),
+                    lightRequirement: document.getElementById('light-req').value,
+                    humidity: Math.floor(Math.random() * 30) + 40,
+                    emoji: "🍀",
+                    notes: document.getElementById('plant-notes').value
+                };
+                plants.push(newPlant);
+                generateReminders();
+                renderPlants();
+                plantForm.reset();
+            });
+
+            plantContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-water')) {
+                    const plantId = parseInt(e.target.closest('.btn-water').getAttribute('data-id'));
+                    const plant = plants.find(p => p.id === plantId);
+                    if (plant) {
+                        plant.lastWatered = new Date();
+                        generateReminders();
+                        renderPlants();
+                    }
+                }
+            });
+
+            init();
+        });
+    </script>
+</body>
+</html>
