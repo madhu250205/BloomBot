@@ -1,11 +1,14 @@
 import re
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_keep_it_safe'
 
-# In-memory database mock (Resets when server restarts)
+# --- DATABASE SETUP ---
+# In a real app, initialize your database here (e.g., SQLAlchemy)
+# For now, we keep the mock list for users
 users = []
+# db = ... (Your database connection object goes here)
 
 @app.route('/')
 def index():
@@ -22,7 +25,6 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        # Validation
         if password != confirm_password:
             flash("Passwords do not match!")
             return redirect(url_for('register'))
@@ -35,7 +37,6 @@ def register():
             flash("Password must be at least 6 characters long.")
             return redirect(url_for('register'))
 
-        # Check if email or username already exists
         for user in users:
             if user['email'] == email:
                 flash("Email already registered.")
@@ -44,7 +45,6 @@ def register():
                 flash("Username already taken.")
                 return redirect(url_for('register'))
 
-        # Append user dictionary to mock database
         users.append({
             'name': name,
             'username': username,
@@ -86,7 +86,6 @@ def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    # Mock data to feed into Dashboard counters
     context = {
         "total_users": len(users) if len(users) > 0 else 1240,
         "active_plants": 856,
@@ -95,6 +94,17 @@ def dashboard():
         "pending_tasks": 18
     }
     return render_template('dashboard.html', username=session['username'], **context)
+
+# --- NEW API ROUTE ---
+@app.route('/api/plant-data')
+def get_plant_data():
+    # Ensure 'db' is your actual database connection object
+    # fetchall() is usually required if using standard SQL connectors
+    query_result = db.execute("SELECT date, health_score FROM plant_logs").fetchall()
+    
+    # Format the data into a list of dictionaries for JSON compatibility
+    data = [{'date': row[0], 'health_score': row[1]} for row in query_result]
+    return jsonify(data)
 
 @app.route('/plant_health')
 def plant_health():

@@ -24,62 +24,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f5f5f5; color: var(--text-color); }
 
-        /* Main Content Styles */
         .content { flex: 1; padding: 20px; background-color: #f9f9f9; max-width: 1200px; margin: 0 auto; }
-
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .header h1 { color: var(--primary-color); }
 
-        .user-profile { display: flex; align-items: center; }
-        .user-profile img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
-        .user-info { display: flex; flex-direction: column; }
-        .user-name { font-weight: 600; }
-        .user-role { font-size: 0.8rem; color: var(--text-light); }
-
-        /* Dashboard Cards */
         .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.3s; }
-        .card:hover { transform: translateY(-5px); }
+        .card { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .card h3 { color: var(--text-light); font-size: 1rem; margin-bottom: 10px; }
         .card p { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
         .card .card-icon { display: flex; justify-content: flex-end; font-size: 2.5rem; color: var(--light-color); margin-top: 10px; }
         
-        .card.warning p { color: var(--warning); }
-        .card.danger p { color: var(--danger); }
-        .card.info p { color: var(--info); }
-
-        /* Charts Section */
-        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .chart-box { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .chart-box h2 { font-size: 1.2rem; margin-bottom: 20px; color: var(--primary-color); }
-
-        /* Recent Activity */
-        .activity-container { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
-        .activity-container h2 { font-size: 1.2rem; margin-bottom: 20px; color: var(--primary-color); }
-        .activity-list { list-style: none; }
-        .activity-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-        .activity-item:last-child { border-bottom: none; }
-        
-        .activity-icon { width: 40px; height: 40px; border-radius: 50%; background-color: var(--light-color); color: var(--primary-color); display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; }
-        .activity-content { flex: 1; }
-        .activity-title { font-weight: 600; margin-bottom: 5px; }
-        .activity-time { font-size: 0.8rem; color: var(--text-light); }
-
-        /* Plant Status */
-        .plant-status { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .plant-card { background-color: var(--white); border-radius: 10px; padding: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; align-items: center; }
-        .plant-image { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; margin-right: 15px; background-color: #eee; display:flex; justify-content:center; align-items:center; font-size:2rem; }
-        .plant-info { flex: 1; }
-        .plant-name { font-weight: 600; margin-bottom: 5px; }
-        .plant-type { font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; }
-        
-        .plant-status-bar { height: 6px; background-color: #eee; border-radius: 3px; margin-bottom: 5px; overflow: hidden; }
-        .plant-status-progress { height: 100%; background-color: var(--primary-color); border-radius: 3px; }
-        
-        .plant-status-text { display: flex; justify-content: space-between; font-size: 0.8rem; }
-        .status-healthy { color: var(--primary-color); }
-        .status-warning { color: var(--warning); }
-        .status-danger { color: var(--danger); }
 
         @media (max-width: 992px) { .charts-container { grid-template-columns: 1fr; } }
     </style>
@@ -92,40 +49,17 @@
         <header class="header">
             <h1>Dashboard Overview</h1>
             <div class="user-profile">
-                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile">
                 <div class="user-info">
                     <span class="user-name">{{ username }}</span>
-                    <span class="user-role">Plant Parent</span>
                 </div>
             </div>
         </header>
 
         <div class="dashboard-cards">
-            <div class="card">
-                <h3>Total Users</h3>
-                <p id="totalUsers">{{ total_users }}</p>
-                <div class="card-icon"><i class="fas fa-users"></i></div>
-            </div>
-            <div class="card">
-                <h3>Active Plants</h3>
-                <p id="activePlants">{{ active_plants }}</p>
-                <div class="card-icon"><i class="fas fa-seedling"></i></div>
-            </div>
-            <div class="card warning">
-                <h3>Needs Water</h3>
-                <p id="needsWater">{{ needs_water }}</p>
-                <div class="card-icon"><i class="fas fa-tint"></i></div>
-            </div>
-            <div class="card danger">
-                <h3>Health Issues</h3>
-                <p id="healthIssues">{{ health_issues }}</p>
-                <div class="card-icon"><i class="fas fa-heartbeat"></i></div>
-            </div>
-            <div class="card info">
-                <h3>Pending Tasks</h3>
-                <p id="pendingTasks">{{ pending_tasks }}</p>
-                <div class="card-icon"><i class="fas fa-tasks"></i></div>
-            </div>
+            <div class="card"><h3>Total Users</h3><p id="totalUsers">{{ total_users }}</p></div>
+            <div class="card"><h3>Active Plants</h3><p id="activePlants">{{ active_plants }}</p></div>
+            <div class="card"><h3>Needs Water</h3><p id="needsWater">{{ needs_water }}</p></div>
+            <div class="card"><h3>Health Issues</h3><p id="healthIssues">{{ health_issues }}</p></div>
         </div>
 
         <div class="charts-container">
@@ -134,138 +68,50 @@
                 <canvas id="userGrowthChart"></canvas>
             </div>
             <div class="chart-box">
-                <h2>Plant Health Distribution</h2>
-                <canvas id="plantHealthChart"></canvas>
-            </div>
-        </div>
-
-        <div class="activity-container">
-            <h2>Recent Activity</h2>
-            <ul class="activity-list">
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fas fa-tint"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-title">Watering reminder for Monstera</div>
-                        <div class="activity-time">10 minutes ago</div>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fas fa-user-plus"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-title">New user registered: {{ username }}</div>
-                        <div class="activity-time">2 hours ago</div>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="activity-content">
-                        <div class="activity-title">Health alert for Snake Plant</div>
-                        <div class="activity-time">5 hours ago</div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Plant Health Status</h2>
-        <div class="plant-status">
-            <div class="plant-card">
-                <div class="plant-image">🌿</div>
-                <div class="plant-info">
-                    <div class="plant-name">Monstera Deliciosa</div>
-                    <div class="plant-type">Tropical Plant</div>
-                    <div class="plant-status-bar"><div class="plant-status-progress" style="width: 85%"></div></div>
-                    <div class="plant-status-text">
-                        <span>Health Status</span>
-                        <span class="status-healthy">Healthy</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="plant-card">
-                <div class="plant-image">🌵</div>
-                <div class="plant-info">
-                    <div class="plant-name">Snake Plant</div>
-                    <div class="plant-type">Succulent</div>
-                    <div class="plant-status-bar"><div class="plant-status-progress" style="width: 45%; background-color: var(--warning)"></div></div>
-                    <div class="plant-status-text">
-                        <span>Health Status</span>
-                        <span class="status-warning">Needs Attention</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="plant-card">
-                <div class="plant-image">🌳</div>
-                <div class="plant-info">
-                    <div class="plant-name">Fiddle Leaf Fig</div>
-                    <div class="plant-type">Tree</div>
-                    <div class="plant-status-bar"><div class="plant-status-progress" style="width: 25%; background-color: var(--danger)"></div></div>
-                    <div class="plant-status-text">
-                        <span>Health Status</span>
-                        <span class="status-danger">Critical</span>
-                    </div>
-                </div>
+                <h2>Plant Health Trend</h2>
+                <canvas id="plantChart"></canvas>
             </div>
         </div>
     </main>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // User Growth Chart
-            const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
-            new Chart(growthCtx, {
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Fetch Dynamic Data from API
+    fetch('/api/plant-data')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('plantChart').getContext('2d');
+            new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    labels: data.map(row => row.date),
                     datasets: [{
-                        label: 'New Users',
-                        data: [120, 190, 170, 220, 280, 350, 410],
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        borderColor: 'rgba(76, 175, 80, 1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
+                        label: 'Plant Health Score',
+                        data: data.map(row => row.health_score),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)'
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+                options: { responsive: true }
             });
-
-            // Plant Health Chart
-            const healthCtx = document.getElementById('plantHealthChart').getContext('2d');
-            new Chart(healthCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Healthy', 'Needs Care', 'Critical'],
-                    datasets: [{
-                        data: [65, 25, 10],
-                        backgroundColor: ['#4CAF50', '#FFC107', '#DC3545'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { position: 'right' } }, cutout: '70%' }
-            });
-
-            // Animate counter values
-            function animateValue(id, start, end, duration) {
-                const obj = document.getElementById(id);
-                if (!obj) return;
-                
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
-                    if (progress < 1) window.requestAnimationFrame(step);
-                };
-                window.requestAnimationFrame(step);
-            }
-            // Using data injected from app.py (Wrapped in strings to fix VS Code linting errors)
-            animateValue("totalUsers", 0, parseInt("{{ total_users }}") || 0, 1000);
-            animateValue("activePlants", 0, parseInt("{{ active_plants }}") || 0, 1000);
-            animateValue("needsWater", 0, parseInt("{{ needs_water }}") || 0, 1000);
-            animateValue("healthIssues", 0, parseInt("{{ health_issues }}") || 0, 1000);
-            animateValue("pendingTasks", 0, parseInt("{{ pending_tasks }}") || 0, 1000);
         });
-    </script>
+
+    // 2. User Growth Chart
+    const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(growthCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'New Users',
+                data: [120, 190, 170, 220, 280, 350],
+                borderColor: 'rgba(76, 175, 80, 1)',
+                tension: 0.4
+            }]
+        }
+    });
+});
+</script>   
 </body>
 </html>
