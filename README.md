@@ -1,35 +1,37 @@
-# Sentiment Analysis Dashboard 📊
+# BloomBot 🌱
 
-A full-stack Flask web app that analyzes the sentiment of user-submitted text and stores results for review on a dashboard.
+A Flask-based plant care web app with user registration, login, and a dashboard for tracking plant health and watering schedules.
 
 ## Features
-- Real-time text input and sentiment scoring
-- Results persisted to a SQLite database
-- Dashboard interface to view past sentiment results
+- User registration and login (session-based authentication)
+- Dashboard view summarizing plant health stats
+- Dedicated pages for plant management, health tracking, watering reminders, and watering schedules
+- Frontend built with HTML, CSS, and JavaScript
 
 ## Tech Stack
 - **Backend:** Python, Flask
-- **Database:** SQLite
-- **Frontend:** HTML
+- **Frontend:** HTML, CSS, JavaScript
+- **Deployment:** Configured for Heroku-style deployment (Procfile included)
 
 ## Project Structure
 ```
-Sentiment-Analysis-Dashboard/
-├── app.py / main.py     # Flask app and sentiment logic
-├── templates/           # HTML templates
-├── sentiment.db         # SQLite database
-└── requirements.txt     # Python dependencies
+BloomBot/
+├── app.py            # Flask app and routes
+├── static/           # CSS/JS assets
+├── templates/        # HTML templates
+├── Procfile          # Deployment config
+└── requirements.txt  # Python dependencies
 ```
 
 ## Run Locally
 ```bash
 pip install -r requirements.txt
-python main.py
+python app.py
 ```
 App runs at `http://localhost:5000`
 
 ## Status
-Personal project built to practice end-to-end Flask development — from data validation to database persistence to frontend display.
+Personal learning project — actively being improved. Current focus areas: moving from in-memory user storage to a persistent database, and adding password hashing.
 
 ## Author
 Madhumitha Arumugam — [GitHub](https://github.com/madhu250205)
