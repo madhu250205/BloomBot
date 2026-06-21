@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - BloomBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { margin: 0; padding: 0; background-image: url('{{ url_for("static", filename="images/plant-bg.png") }}'); background-size: cover; background-position: center; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; }
         .login-container { width: 400px; padding: 30px; background-color: #e1f7e7; border-radius: 12px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
         .login-container h2 { text-align: center; color: #2e8b57; }
         .login-container form { display: flex; flex-direction: column; }
-        .login-container input { padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; }
-        .login-container button { padding: 12px; background-color: #2e8b57; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .login-container input { padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        .login-container button { padding: 12px; background-color: #2e8b57; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .login-container button:hover { background-color: #3a9e6d; }
         .login-container a { text-align: center; display: block; margin-top: 15px; color: #2e8b57; text-decoration: none; font-weight: bold; }
         .login-container ul { color: red; padding-left: 20px; list-style-type: square; }
@@ -30,10 +31,34 @@
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required>
             <input type="email" name="email" placeholder="Email Address" required>
-            <input type="password" name="password" placeholder="Password" required>
+            
+            <div class="password-wrapper" style="position: relative; display: flex; align-items: center; width: 100%;">
+                <input type="password" id="password" name="password" placeholder="Password" required style="width: 100%; padding-right: 40px;">
+                <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)" style="position: absolute; right: 10px; cursor: pointer; color: #777;"></i>
+            </div>
+
             <button type="submit">Login</button>
         </form>
         <a href="{{ url_for('register') }}">Don't have an account? Register</a>
     </div>
+
+    <script>
+function togglePassword(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    
+    // Check current type and swap it
+    if (input.type === "password") {
+        input.type = "text";
+        // Show normal eye when text is visible
+        iconElement.classList.remove("fa-eye-slash");
+        iconElement.classList.add("fa-eye");
+    } else {
+        input.type = "password";
+        // Show slashed eye when text is hidden (dots)
+        iconElement.classList.remove("fa-eye");
+        iconElement.classList.add("fa-eye-slash");
+    }
+}
+</script>
 </body>
 </html>

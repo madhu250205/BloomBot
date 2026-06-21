@@ -1,14 +1,23 @@
+import os
 import re
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+from pymongo import MongoClient
 
+# --- SETUP ---
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_keep_it_safe'
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
+bcrypt = Bcrypt(app)
 
-# --- DATABASE SETUP ---
-# In a real app, initialize your database here (e.g., SQLAlchemy)
-# For now, we keep the mock list for users
-users = []
-# db = ... (Your database connection object goes here)
+# Database setup
+MONGO_URI = os.getenv('MONGO_URI')
+client = MongoClient(MONGO_URI)
+db = client['bloom_bot_db']
+users_collection = db['users'] 
+
+# --- ROUTES ---
 
 @app.route('/')
 def index():
@@ -29,27 +38,14 @@ def register():
             flash("Passwords do not match!")
             return redirect(url_for('register'))
 
-        if not re.match(r"^[A-Za-z0-9_]+$", username):
-            flash("Username must contain only alphanumeric characters and underscores.")
-            return redirect(url_for('register'))
+        # Security: Hash the password
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        if len(password) < 6:
-            flash("Password must be at least 6 characters long.")
-            return redirect(url_for('register'))
-
-        for user in users:
-            if user['email'] == email:
-                flash("Email already registered.")
-                return redirect(url_for('register'))
-            if user['username'] == username:
-                flash("Username already taken.")
-                return redirect(url_for('register'))
-
-        users.append({
+        users_collection.insert_one({
             'name': name,
             'username': username,
             'email': email,
-            'password': password
+            'password': hashed_password
         })
         flash("Registration successful. Please log in.")
         return redirect(url_for('login'))
@@ -59,16 +55,22 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        input_username = request.form.get('username')
         input_email = request.form.get('email')
         input_password = request.form.get('password')
 
-        for user in users:
-            if user['email'] == input_email and user['password'] == input_password:
-                session['username'] = user['username']
-                session['name'] = user['name']
-                session['email'] = user['email']
-                return redirect(url_for('home'))
+        user = users_collection.find_one({"email": input_email})
+        
+        if user:
+            try:
+                # Security: Check hashed password safely
+                if bcrypt.check_password_hash(user['password'], input_password):
+                    session['username'] = user['username']
+                    session['name'] = user['name']
+                    session['email'] = user['email']
+                    return redirect(url_for('home'))
+            except ValueError:
+                # This catches the "Invalid salt" error from old plain-text passwords
+                pass
                 
         flash("Invalid credentials. Please try again.")
         return redirect(url_for('login'))
@@ -86,25 +88,31 @@ def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
     
+    total_users_count = users_collection.count_documents({})
+    
     context = {
-        "total_users": len(users) if len(users) > 0 else 1240,
-        "active_plants": 856,
-        "needs_water": 127,
-        "health_issues": 42,
-        "pending_tasks": 18
+        "total_users": total_users_count,
+        "active_plants": 0,
+        "needs_water": 0,
+        "health_issues": 0,
+        "pending_tasks": 0
     }
     return render_template('dashboard.html', username=session['username'], **context)
 
-# --- NEW API ROUTE ---
 @app.route('/api/plant-data')
 def get_plant_data():
-    # Ensure 'db' is your actual database connection object
-    # fetchall() is usually required if using standard SQL connectors
-    query_result = db.execute("SELECT date, health_score FROM plant_logs").fetchall()
-    
-    # Format the data into a list of dictionaries for JSON compatibility
-    data = [{'date': row[0], 'health_score': row[1]} for row in query_result]
-    return jsonify(data)
+    # Use a safety check for the collection
+    if 'plant_logs' not in db.list_collection_names():
+        return jsonify([])
+    query_result = list(db['plant_logs'].find({}, {"_id": 0, "date": 1, "health_score": 1}))
+    return jsonify(query_result)
+
+# ... (Include your other routes like plant_health, plant_management, etc. here) ...
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 @app.route('/plant_health')
 def plant_health():
@@ -116,7 +124,9 @@ def plant_health():
 def plant_management():
     if 'username' not in session:
         return redirect(url_for('login'))
-    return render_template('plant_management.html', username=session['username'])
+    # Fetch plants from DB to pass to the table
+    my_plants = list(db['plants'].find({'username': session['username']}))
+    return render_template('plant_management.html', username=session['username'], plants=my_plants)
 
 @app.route('/health_tracker')
 def health_tracker():
@@ -135,11 +145,6 @@ def watering():
     if 'username' not in session:
         return redirect(url_for('login'))
     return render_template('watering.html', username=session['username'])
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return render_template('logout.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

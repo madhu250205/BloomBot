@@ -28,17 +28,26 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .header h1 { color: var(--primary-color); }
 
-        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-        .card h3 { color: var(--text-light); font-size: 1rem; margin-bottom: 10px; }
-        .card p { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
-        .card .card-icon { display: flex; justify-content: flex-end; font-size: 2.5rem; color: var(--light-color); margin-top: 10px; }
+        /* Grid updated to handle 5 cards nicely */
+        .dashboard-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px; }
+        .card { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); text-align: center; }
+        .card h3 { color: var(--text-light); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;}
         
-        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .chart-box { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-        .chart-box h2 { font-size: 1.2rem; margin-bottom: 20px; color: var(--primary-color); }
+        /* Matching the specific colors from your reference image for the numbers */
+        .card:nth-child(1) p { font-size: 1.8rem; font-weight: bold; color: #4CAF50; } /* Green */
+        .card:nth-child(2) p { font-size: 1.8rem; font-weight: bold; color: #4CAF50; } /* Green */
+        .card:nth-child(3) p { font-size: 1.8rem; font-weight: bold; color: #FF9800; } /* Orange */
+        .card:nth-child(4) p { font-size: 1.8rem; font-weight: bold; color: #F44336; } /* Red */
+        .card:nth-child(5) p { font-size: 1.8rem; font-weight: bold; color: #2196F3; } /* Blue */
+        
+        .charts-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-box { background-color: var(--white); border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
+        .chart-box h2 { font-size: 1.1rem; margin-bottom: 20px; color: var(--primary-color); text-align: center; }
 
-        @media (max-width: 992px) { .charts-container { grid-template-columns: 1fr; } }
+        @media (max-width: 992px) { 
+            .charts-container { grid-template-columns: 1fr; } 
+            .dashboard-cards { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));}
+        }
     </style>
 </head>
 <body>
@@ -50,7 +59,7 @@
             <h1>Dashboard Overview</h1>
             <div class="user-profile">
                 <div class="user-info">
-                    <span class="user-name">{{ username }}</span>
+                    <span class="user-name">Welcome, {{ username }}</span>
                 </div>
             </div>
         </header>
@@ -60,6 +69,7 @@
             <div class="card"><h3>Active Plants</h3><p id="activePlants">{{ active_plants }}</p></div>
             <div class="card"><h3>Needs Water</h3><p id="needsWater">{{ needs_water }}</p></div>
             <div class="card"><h3>Health Issues</h3><p id="healthIssues">{{ health_issues }}</p></div>
+            <div class="card"><h3>Pending Tasks</h3><p id="pendingTasks">{{ pending_tasks }}</p></div>
         </div>
 
         <div class="charts-container">
@@ -68,36 +78,43 @@
                 <canvas id="userGrowthChart"></canvas>
             </div>
             <div class="chart-box">
-                <h2>Plant Health Trend</h2>
+                <h2>Plant Health Distribution</h2>
                 <canvas id="plantChart"></canvas>
             </div>
         </div>
     </main>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Fetch Dynamic Data from API
-    fetch('/api/plant-data')
-        .then(response => response.json())
-        .then(data => {
-            const ctx = document.getElementById('plantChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(row => row.date),
-                    datasets: [{
-                        label: 'Plant Health Score',
-                        data: data.map(row => row.health_score),
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        fill: true,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)'
-                    }]
-                },
-                options: { responsive: true }
-            });
-        });
+    
+    // 1. Plant Health Distribution (Donut Chart)
+    const plantCtx = document.getElementById('plantChart').getContext('2d');
+    new Chart(plantCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Healthy', 'Needs Care', 'Critical'],
+            datasets: [{
+                data: [70, 20, 10], // Placeholder percentages matching your image
+                backgroundColor: [
+                    '#4CAF50', // Green
+                    '#FFC107', // Yellow
+                    '#F44336'  // Red
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: { 
+            responsive: true,
+            cutout: '65%', // This creates the donut hole
+            plugins: {
+                legend: {
+                    position: 'right', // Puts the legend on the side like your image
+                    labels: { boxWidth: 15 }
+                }
+            }
+        }
+    });
 
-    // 2. User Growth Chart
+    // 2. User Growth Chart (Filled Line Chart)
     const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
     new Chart(growthCtx, {
         type: 'line',
@@ -106,9 +123,18 @@ document.addEventListener("DOMContentLoaded", function() {
             datasets: [{
                 label: 'New Users',
                 data: [120, 190, 170, 220, 280, 350],
-                borderColor: 'rgba(76, 175, 80, 1)',
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.2)', // Creates the green shading under the line
+                fill: true,
                 tension: 0.4
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } }, // Hides the top legend to match your image
+            scales: {
+                y: { beginAtZero: true }
+            }
         }
     });
 });
